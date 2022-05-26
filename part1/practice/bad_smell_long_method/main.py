@@ -8,55 +8,41 @@
 # это делает, но мы бы советовали разнести функционал 
 # по более узким функциям и написать их с нуля
 
+from operator import itemgetter
 
 csv = """Вася;39\nПетя;26\nВасилий Петрович;9"""
+AGE_LIMIT = 10
+
+
+def _read(str_value):
+    values_per_row = str_value.split("\n")
+    data_in_list = []
+    for element in values_per_row:
+        name, age = element.split(";")
+        data_in_list.append({"name": name, "age": int(age)})
+    return data_in_list
+
+
+def _sort(data):
+    # Сортировка по возрасту по возрастанию
+    data_sorted = sorted(data, key=itemgetter("age"))
+    return data_sorted
+
+
+def _filter(data):
+    # берем людей не младше 10 лет (см AGE_LIMIT)
+    data_filtered_by_age = []
+    for person in data:
+        if person["age"] >= AGE_LIMIT:
+            data_filtered_by_age.append(person)
+    return data_filtered_by_age
 
 
 def get_users_list():
-    # Чтение данных из строки
-    data = []
-    for line in csv.split('\n'):
-        name, age = line.split(';')
-        data.append({'name': name, 'age': int(age)})
-
-    # Сортировка по возрасту по возрастанию
-    _new_data = []
-    used_person = set()
-    minimum_age_person = None
-    while len(used_person) != len(data):
-        if minimum_age_person is None:
-            for person in data:
-                if minimum_age_person is None:
-                    minimum_age_person = person
-                else:
-                    if person['name'] in used_person:
-                        continue
-                    else:
-                        if person['age'] < minimum_age_person['age']:
-                            minimum_age_person = person
-            _new_data.append(minimum_age_person)
-            used_person.add(minimum_age_person['name'])
-        local_minimum = None
-        for person in data:
-            if person['name'] in used_person:
-                continue
-            else:
-                if not local_minimum is None:
-                    if person['age'] < local_minimum['age']:
-                        local_minimum = person
-                else:
-                    local_minimum = person
-        _new_data.append(local_minimum)
-        used_person.add(local_minimum['name'])
-
-    # Фильтрация
-    result_data = []
-    for person in _new_data:
-        if person['age'] < 10:
-            continue
-        else:
-            result_data.append(person)
-    return result_data
+    data_dicts_in_list = _read(csv)
+    data_sorted_by_age = _sort(data_dicts_in_list)
+    data_result = _filter(data_sorted_by_age)
+    return data_result
 
 
 if __name__ == '__main__':

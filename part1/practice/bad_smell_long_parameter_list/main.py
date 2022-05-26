@@ -9,42 +9,45 @@
 # В этом примере есть сразу несколько запахов плохого кода. Исправьте их
 #   (длинный метод, длинный список параметров)
 
+# Должен быть устранен длинный список параметров (количество параметров не больше трех)
+# Должен быть устранен длинный метод - отдельно метод получения скорости, отдельно метод смещения по полю
 
 class Unit:
-    def move(self, field, x_coord, y_coord, direction, is_fly, crawl, speed = 1):
+    def __init__(self, x_coord, y_coord, movement_type):
+        self.x_coord = x_coord
+        self.y_coord = y_coord
+        self.field = self.set_field()
+        self.movement_type = movement_type
+        self.speed = self._determine_speed()
 
-        if is_fly and crawl:
-            raise ValueError('Рожденный ползать летать не должен!')
+    def set_field(self):
+        # некая инициализация поля подразумевается
+        return self.field
 
-        if is_fly:
-            speed *= 1.2
-            if direction == 'UP':
-                new_y = y_coord + speed
-                new_x = x_coord
-            elif direction == 'DOWN':
-                new_y = y_coord - speed
-                new_x = x_coord
-            elif direction == 'LEFT':
-                new_y = y_coord
-                new_x = x_coord - speed
-            elif direction == 'RIGTH':
-                new_y = y_coord
-                new_x = x_coord + speed
-        if crawl:
-            speed *= 0.5
-            if direction == 'UP':
-                new_y = y_coord + speed
-                new_x = x_coord
-            elif direction == 'DOWN':
-                new_y = y_coord - speed
-                new_x = x_coord
-            elif direction == 'LEFT':
-                new_y = y_coord
-                new_x = x_coord - speed
-            elif direction == 'RIGTH':
-                new_y = y_coord
-                new_x = x_coord + speed
+    def set_unit(self, x, y, unit):
+        # функция set_unit ниже используется, но ее поведение не было определено.
+        pass
 
-            field.set_unit(x=new_x, y=new_y, unit=self)
+    def _determine_speed(self):
+        if self.movement_type == "default":
+            self.speed = 1
+        if self.movement_type == "fly":
+            self.speed = self.speed * 1.2
+        if self.movement_type == "crawl":
+            self.speed = self.speed * 0.5
+        else:
+            raise ValueError('Что-то пошло не так.')
+        return self.speed
 
-#     ...
+    def move_in_field(self, direction):
+        if direction == 'UP':
+            self.field.set_unit(x=self.x_coord, y=self.y_coord + self.speed, unit=self)
+        elif direction == 'DOWN':
+            self.field.set_unit(x=self.x_coord, y=self.y_coord - self.speed, unit=self)
+        elif direction == 'LEFT':
+            self.field.set_unit(x=self.x_coord - self.speed, y=self.y_coord, unit=self)
+        elif direction == 'RIGTH':
+            self.field.set_unit(x=self.x_coord + self.speed, y=self.y_coord, unit=self)
+
+
+...
